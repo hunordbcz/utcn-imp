@@ -13,18 +13,19 @@
  * Enumeration of the opcodes supported by the interpreter.
  */
 enum class Opcode : uint8_t {
-  PUSH_FUNC,
-  PUSH_PROTO,
+    PUSH_FUNC,
+    PUSH_PROTO,
+    PUSH_INT,
 
-  PEEK,
-  POP,
-  CALL,
+    PEEK,
+    POP,
+    CALL,
 
-  ADD,
-  SUB,
-  RET,
+    ADD,
+    SUB,
+    RET,
 
-  JUMP_FALSE,
+    JUMP_FALSE,
   JUMP,
   STOP
 };

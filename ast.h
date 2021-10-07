@@ -42,9 +42,10 @@ private:
 class Expr : public Node {
 public:
   enum class Kind {
-    REF,
-    BINARY,
-    CALL,
+      REF,
+      BINARY,
+      CALL,
+      INT,
   };
 
 public:
@@ -126,13 +127,29 @@ public:
 
   const Expr &GetCallee() const { return *callee_; }
 
-  size_t arg_size() const { return args_.size(); }
-  ArgList::const_reverse_iterator arg_rbegin() const { return args_.rbegin(); }
-  ArgList::const_reverse_iterator arg_rend() const { return args_.rend(); }
+    size_t arg_size() const { return args_.size(); }
+
+    ArgList::const_reverse_iterator arg_rbegin() const { return args_.rbegin(); }
+
+    ArgList::const_reverse_iterator arg_rend() const { return args_.rend(); }
 
 private:
-  std::shared_ptr<Expr> callee_;
-  ArgList args_;
+    std::shared_ptr<Expr> callee_;
+    ArgList args_;
+};
+
+class IntExpr : public Expr {
+public:
+    IntExpr(const uint64_t &value)
+            : Expr(Kind::INT), payload(value) {
+    }
+
+    const uint64_t &getPayload() const {
+        return payload;
+    }
+
+private:
+    uint64_t payload;
 };
 
 /**
@@ -140,10 +157,10 @@ private:
  */
 class BlockStmt final : public Stmt {
 public:
-  using BlockList = std::vector<std::shared_ptr<Stmt>>;
+    using BlockList = std::vector<std::shared_ptr<Stmt>>;
 
 public:
-  BlockStmt(std::vector<std::shared_ptr<Stmt>> &&body)
+    BlockStmt(std::vector<std::shared_ptr<Stmt>> &&body)
     : Stmt(Kind::BLOCK)
     , body_(body)
   {

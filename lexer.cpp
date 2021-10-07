@@ -86,16 +86,21 @@ Token Token::Ident(const Location &l, const std::string &str)
 }
 
 // -----------------------------------------------------------------------------
-Token Token::String(const Location &l, const std::string &str)
-{
+Token Token::String(const Location &l, const std::string &str) {
   Token tk(l, Kind::STRING);
   tk.value_.StringValue = new std::string(str);
   return tk;
 }
 
 // -----------------------------------------------------------------------------
-void Token::Print(std::ostream &os) const
-{
+Token Token::Int(const Location &l, const uint64_t &payload) {
+  Token tk(l, Kind::INT);
+  tk.value_.IntValue = payload;
+  return tk;
+}
+
+// -----------------------------------------------------------------------------
+void Token::Print(std::ostream &os) const {
   os << kind_;
   switch (kind_) {
     case Kind::INT: {
@@ -223,12 +228,14 @@ const Token &Lexer::Next()
       }
 
       if (isdigit(chr_)) {
-        std::uint64_t number = 0;
+        int64_t number = 0;
         do {
           number *= 10;
           number += (chr_ - '0');
           NextChar();
         } while (isdigit(chr_));
+
+        return tk_ = Token::Int(loc, static_cast<uint64_t>(number));
       }
 
       Error("unknown character '" + std::string(1, chr_) + "'");

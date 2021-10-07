@@ -78,25 +78,33 @@ public:
   std::string_view GetIdent() const
   {
     assert(Is(Kind::IDENT) && "not an identifier");
-    return *value_.StringValue;
+      return *value_.StringValue;
   }
 
-  /// Return the string value.
-  std::string_view GetString() const
-  {
-    assert(Is(Kind::STRING) && "not an identifier");
-    return *value_.StringValue;
-  }
+    /// Return the string value.
+    std::string_view GetString() const {
+        assert(Is(Kind::STRING) && "not an identifier");
+        return *value_.StringValue;
+    }
 
-  /// Copy operator.
-  Token &operator=(const Token &that);
+    uint64_t GetInteger() const {
+        assert(Is(Kind::INT) && "not an identifier");
+        return value_.IntValue;
+    }
 
-  // Helpers to build tokens.
-  static Token End(const Location &l) { return Token(l, Kind::END); }
-  static Token LParen(const Location &l) { return Token(l, Kind::LPAREN); }
-  static Token RParen(const Location &l) { return Token(l, Kind::RPAREN); }
-  static Token LBrace(const Location &l) { return Token(l, Kind::LBRACE); }
-  static Token RBrace(const Location &l) { return Token(l, Kind::RBRACE); }
+    /// Copy operator.
+    Token &operator=(const Token &that);
+
+    // Helpers to build tokens.
+    static Token End(const Location &l) { return Token(l, Kind::END); }
+
+    static Token LParen(const Location &l) { return Token(l, Kind::LPAREN); }
+
+    static Token RParen(const Location &l) { return Token(l, Kind::RPAREN); }
+
+    static Token LBrace(const Location &l) { return Token(l, Kind::LBRACE); }
+
+    static Token RBrace(const Location &l) { return Token(l, Kind::RBRACE); }
   static Token Colon(const Location &l) { return Token(l, Kind::COLON); }
   static Token Semi(const Location &l) { return Token(l, Kind::SEMI); }
   static Token Equal(const Location &l) { return Token(l, Kind::EQUAL); }
@@ -107,8 +115,10 @@ public:
   static Token Return(const Location &l) { return Token(l, Kind::RETURN); }
   static Token While(const Location &l) { return Token(l, Kind::WHILE); }
   static Token Ident(const Location &l, const std::string &str);
-  static Token String(const Location &l, const std::string &str);
-  static Token Int(const Location &l, const uint64_t &payload) { return Token(l, Kind::INT); }
+
+    static Token String(const Location &l, const std::string &str);
+
+    static Token Int(const Location &l, const uint64_t &payload);
 
   /// Print the token to a stream.
   void Print(std::ostream &os) const;

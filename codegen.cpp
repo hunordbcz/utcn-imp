@@ -177,6 +177,9 @@ void Codegen::LowerExpr(const Scope &scope, const Expr &expr)
     case Expr::Kind::CALL: {
       return LowerCallExpr(scope, static_cast<const CallExpr &>(expr));
     }
+    case Expr::Kind::INT: {
+      return LowerIntExpr(scope, static_cast<const IntExpr &>(expr));
+    }
   }
 }
 
@@ -201,13 +204,17 @@ void Codegen::LowerRefExpr(const Scope &scope, const RefExpr &expr)
 }
 
 // -----------------------------------------------------------------------------
-void Codegen::LowerBinaryExpr(const Scope &scope, const BinaryExpr &binary)
-{
+void Codegen::LowerIntExpr(const Scope &scope, const IntExpr &expr) {
+  EmitPushInt(expr.getPayload());
+}
+
+// -----------------------------------------------------------------------------
+void Codegen::LowerBinaryExpr(const Scope &scope, const BinaryExpr &binary) {
   LowerExpr(scope, binary.GetLHS());
   LowerExpr(scope, binary.GetRHS());
   switch (binary.GetKind()) {
     case BinaryExpr::Kind::SUB: {
-      return EmitMinus();
+      return EmitSubtract();
     }
     
     case BinaryExpr::Kind::ADD: {
@@ -311,16 +318,22 @@ void Codegen::EmitPushFunc(Label entry)
 }
 
 // -----------------------------------------------------------------------------
-void Codegen::EmitPushProto(RuntimeFn fn)
-{
+void Codegen::EmitPushProto(RuntimeFn fn) {
   depth_ += 1;
   Emit<Opcode>(Opcode::PUSH_PROTO);
   Emit<RuntimeFn>(fn);
 }
 
 // -----------------------------------------------------------------------------
-void Codegen::EmitPeek(uint32_t index)
-{
+void Codegen::EmitPushInt(uint64_t payload) {
+  depth_ += 1;
+  Emit<Opcode>(Opcode::PUSH_INT);
+  Emit<uint64_t>(payload);
+}
+
+
+// -----------------------------------------------------------------------------
+void Codegen::EmitPeek(uint32_t index) {
   depth_ += 1;
   Emit<Opcode>(Opcode::PEEK);
   Emit<uint32_t>(index);
@@ -345,8 +358,7 @@ void Codegen::EmitAdd()
 }
 
 // -----
-void Codegen::EmitMinus()
-{
+void Codegen::EmitSubtract() {
   assert(depth_ > 0 && "no elements on stack");
   depth_ -= 1;
   Emit<Opcode>(Opcode::SUB);
