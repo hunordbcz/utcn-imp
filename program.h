@@ -8,24 +8,24 @@
 #include <vector>
 
 
-
 /**
  * Enumeration of the opcodes supported by the interpreter.
  */
 enum class Opcode : uint8_t {
-    PUSH_FUNC,
-    PUSH_PROTO,
-    PUSH_INT,
+  PUSH_FUNC,
+  PUSH_PROTO,
+  PUSH_INT,
 
-    PEEK,
-    POP,
-    CALL,
+  PEEK,
+  POP,
+  CALL,
 
-    ADD,
-    SUB,
-    RET,
+  EQUALITY,
+  ADD,
+  SUB,
+  RET,
 
-    JUMP_FALSE,
+  JUMP_FALSE,
   JUMP,
   STOP
 };
@@ -41,8 +41,7 @@ public:
 
   /// Read a value from a specific location.
   template<typename T>
-  T Read(size_t &pc)
-  {
+  T Read(size_t &pc) {
     T t;
     assert(pc + sizeof(T) <= code_.size());
     memcpy(&t, code_.data() + pc, sizeof(T));

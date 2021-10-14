@@ -39,9 +39,11 @@ private:
   std::shared_ptr<ReturnStmt> ParseReturnStmt();
   /// Parse a while loop.
   std::shared_ptr<WhileStmt> ParseWhileStmt();
+  /// Parse an if statement.
+  std::shared_ptr<IfStmt> ParseIfStmt();
 
   /// Parse a single expression.
-  std::shared_ptr<Expr> ParseExpr() { return ParseAddSubExpr(); }
+  std::shared_ptr<Expr> ParseExpr();
   /// Parse an expression which has no operators.
   std::shared_ptr<Expr> ParseTermExpr();
   /// Parse a call expression.

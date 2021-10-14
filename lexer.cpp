@@ -128,12 +128,15 @@ std::ostream &operator<<(std::ostream &os, const Token::Kind kind)
     case Token::Kind::FUNC: return os << "func";
     case Token::Kind::RETURN: return os << "return";
     case Token::Kind::WHILE: return os << "while";
+    case Token::Kind::IF: return os << "if";
+    case Token::Kind::ELSE: return os << "else";
     case Token::Kind::LPAREN: return os << "(";
     case Token::Kind::RPAREN: return os << ")";
     case Token::Kind::LBRACE: return os << "{";
     case Token::Kind::RBRACE: return os << "}";
     case Token::Kind::COLON: return os << ":";
     case Token::Kind::SEMI: return os << ";";
+    case Token::Kind::EQUALITY: return os << "==";
     case Token::Kind::EQUAL: return os << "=";
     case Token::Kind::COMMA: return os << ",";
     case Token::Kind::PLUS: return os << "+";
@@ -197,7 +200,13 @@ const Token &Lexer::Next()
     case '}': return NextChar(), tk_ = Token::RBrace(loc);
     case ':': return NextChar(), tk_ = Token::Colon(loc);
     case ';': return NextChar(), tk_ = Token::Semi(loc);
-    case '=': return NextChar(), tk_ = Token::Equal(loc);
+    case '=': {
+      NextChar();
+      if (chr_ == '=') {
+        return tk_ = Token::Equality(loc);
+      }
+      return tk_ = Token::Equal(loc);
+    }
     case '+': return NextChar(), tk_ = Token::Plus(loc);
     case '-': return NextChar(), tk_ = Token::Minus(loc);
     case ',': return NextChar(), tk_ = Token::Comma(loc);
@@ -224,6 +233,8 @@ const Token &Lexer::Next()
         if (word == "func") return tk_ = Token::Func(loc);
         if (word == "return") return tk_ = Token::Return(loc);
         if (word == "while") return tk_ = Token::While(loc);
+        if (word == "if") return tk_ = Token::If(loc);
+        if (word == "else") return tk_ = Token::Else(loc);
         return tk_ = Token::Ident(loc, word);
       }
 

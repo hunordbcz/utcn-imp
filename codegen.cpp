@@ -114,6 +114,9 @@ void Codegen::LowerStmt(const Scope &scope, const Stmt &stmt)
     case Stmt::Kind::WHILE: {
       return LowerWhileStmt(scope, static_cast<const WhileStmt &>(stmt));
     }
+    case Stmt::Kind::IF: {
+      return LowerIfStmt(scope, static_cast<const IfStmt &>(stmt));
+    }
     case Stmt::Kind::EXPR: {
       return LowerExprStmt(scope, static_cast<const ExprStmt &>(stmt));
     }
@@ -148,6 +151,19 @@ void Codegen::LowerWhileStmt(const Scope &scope, const WhileStmt &whileStmt)
   LowerStmt(scope, whileStmt.GetStmt());
   EmitJump(entry);
   EmitLabel(exit);
+}
+
+void Codegen::LowerIfStmt(const Scope &scope, const IfStmt &ifStmt) {
+  auto elseStmtLabel = MakeLabel();
+
+  LowerExpr(scope, ifStmt.GetCond());
+  EmitJumpFalse(elseStmtLabel);
+  LowerStmt(scope, ifStmt.GetIfStmt());
+  EmitLabel(elseStmtLabel);
+  if (ifStmt.hasElse()) {
+    LowerStmt(scope, ifStmt.GetElseStmt());
+  }
+
 }
 
 // -----------------------------------------------------------------------------

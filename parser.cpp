@@ -7,10 +7,8 @@
 #include "ast.h"
 
 
-
 // -----------------------------------------------------------------------------
-static std::string FormatMessage(const Location &loc, const std::string &msg)
-{
+static std::string FormatMessage(const Location &loc, const std::string &msg) {
   std::ostringstream os;
   os << "[" << loc.Name << ":" << loc.Line << ":" << loc.Column << "] " << msg;
   return os.str();
@@ -18,20 +16,17 @@ static std::string FormatMessage(const Location &loc, const std::string &msg)
 
 // -----------------------------------------------------------------------------
 ParserError::ParserError(const Location &loc, const std::string &msg)
-  : std::runtime_error(FormatMessage(loc, msg))
-{
+    : std::runtime_error(FormatMessage(loc, msg)) {
 }
 
 
 // -----------------------------------------------------------------------------
 Parser::Parser(Lexer &lexer)
-  : lexer_(lexer)
-{
+    : lexer_(lexer) {
 }
 
 // -----------------------------------------------------------------------------
-std::shared_ptr<Module> Parser::ParseModule()
-{
+std::shared_ptr<Module> Parser::ParseModule() {
   std::vector<TopLevelStmt> body;
   while (auto tk = Current()) {
     if (tk.Is(Token::Kind::FUNC)) {
@@ -82,20 +77,24 @@ std::shared_ptr<Module> Parser::ParseModule()
 }
 
 // -----------------------------------------------------------------------------
-std::shared_ptr<Stmt> Parser::ParseStmt()
-{
+std::shared_ptr<Stmt> Parser::ParseStmt() {
   auto tk = Current();
   switch (tk.GetKind()) {
-    case Token::Kind::RETURN: return ParseReturnStmt();
-    case Token::Kind::WHILE: return ParseWhileStmt();
-    case Token::Kind::LBRACE: return ParseBlockStmt();
-    default: return std::make_shared<ExprStmt>(ParseExpr());
+    case Token::Kind::RETURN:
+      return ParseReturnStmt();
+    case Token::Kind::WHILE:
+      return ParseWhileStmt();
+    case Token::Kind::IF:
+      return ParseIfStmt();
+    case Token::Kind::LBRACE:
+      return ParseBlockStmt();
+    default:
+      return std::make_shared<ExprStmt>(ParseExpr());
   }
 }
 
 // -----------------------------------------------------------------------------
-std::shared_ptr<BlockStmt> Parser::ParseBlockStmt()
-{
+std::shared_ptr<BlockStmt> Parser::ParseBlockStmt() {
   Check(Token::Kind::LBRACE);
 
   std::vector<std::shared_ptr<Stmt>> body;
@@ -111,8 +110,7 @@ std::shared_ptr<BlockStmt> Parser::ParseBlockStmt()
 }
 
 // -----------------------------------------------------------------------------
-std::shared_ptr<ReturnStmt> Parser::ParseReturnStmt()
-{
+std::shared_ptr<ReturnStmt> Parser::ParseReturnStmt() {
   Check(Token::Kind::RETURN);
   lexer_.Next();
   auto expr = ParseExpr();
@@ -120,8 +118,7 @@ std::shared_ptr<ReturnStmt> Parser::ParseReturnStmt()
 }
 
 // -----------------------------------------------------------------------------
-std::shared_ptr<WhileStmt> Parser::ParseWhileStmt()
-{
+std::shared_ptr<WhileStmt> Parser::ParseWhileStmt() {
   Check(Token::Kind::WHILE);
   Expect(Token::Kind::LPAREN);
   lexer_.Next();
@@ -133,8 +130,39 @@ std::shared_ptr<WhileStmt> Parser::ParseWhileStmt()
 }
 
 // -----------------------------------------------------------------------------
-std::shared_ptr<Expr> Parser::ParseTermExpr()
-{
+std::shared_ptr<IfStmt> Parser::ParseIfStmt() {
+  Check(Token::Kind::IF);
+
+  Expect(Token::Kind::LPAREN);
+  lexer_.Next();
+  auto cond = ParseExpr();
+  Check(Token::Kind::RPAREN);
+  lexer_.Next();
+  auto mainStmt = ParseStmt();
+
+  std::shared_ptr<Stmt> elseStmt = nullptr;
+  if (Current().Is(Token::Kind::ELSE)) {
+    lexer_.Next();
+    elseStmt = ParseStmt();
+  }
+
+  return std::make_shared<IfStmt>(std::move(cond), std::move(mainStmt), std::move(elseStmt));
+}
+
+std::shared_ptr<Expr> Parser::ParseExpr() {
+  auto tk = Current();
+  switch (tk.GetKind()) {
+    case Token::Kind::EQUALITY:
+      assert("HAHAHAHAHA");
+    default:
+      break;
+  }
+
+  return ParseAddSubExpr();
+}
+
+// -----------------------------------------------------------------------------
+std::shared_ptr<Expr> Parser::ParseTermExpr() {
   auto tk = Current();
   switch (tk.GetKind()) {
     case Token::Kind::IDENT: {
@@ -160,8 +188,7 @@ std::shared_ptr<Expr> Parser::ParseTermExpr()
 }
 
 // -----------------------------------------------------------------------------
-std::shared_ptr<Expr> Parser::ParseCallExpr()
-{
+std::shared_ptr<Expr> Parser::ParseCallExpr() {
   std::shared_ptr<Expr> callee = ParseTermExpr();
   while (Current().Is(Token::Kind::LPAREN)) {
     std::vector<std::shared_ptr<Expr>> args;
@@ -179,8 +206,7 @@ std::shared_ptr<Expr> Parser::ParseCallExpr()
 }
 
 // -----------------------------------------------------------------------------
-std::shared_ptr<Expr> Parser::ParseAddSubExpr()
-{
+std::shared_ptr<Expr> Parser::ParseAddSubExpr() {
   std::shared_ptr<Expr> term = ParseCallExpr();
   while (Current().Is(Token::Kind::PLUS) || Current().Is(Token::Kind::MINUS)) {
     const bool isPlus = Current().Is(Token::Kind::PLUS);
@@ -200,15 +226,13 @@ std::shared_ptr<Expr> Parser::ParseAddSubExpr()
 }
 
 // -----------------------------------------------------------------------------
-const Token &Parser::Expect(Token::Kind kind)
-{
+const Token &Parser::Expect(Token::Kind kind) {
   lexer_.Next();
   return Check(kind);
 }
 
 // -----------------------------------------------------------------------------
-const Token &Parser::Check(Token::Kind kind)
-{
+const Token &Parser::Check(Token::Kind kind) {
   const auto &tk = Current();
   if (kind != tk.GetKind()) {
     std::ostringstream os;
@@ -219,7 +243,6 @@ const Token &Parser::Check(Token::Kind kind)
 }
 
 // -----------------------------------------------------------------------------
-void Parser::Error(const Location &loc, const std::string &msg)
-{
+void Parser::Error(const Location &loc, const std::string &msg) {
   throw ParserError(loc, msg);
 }

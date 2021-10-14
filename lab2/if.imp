@@ -1,0 +1,13 @@
+
+func print_int(a: int): int = "print_int"
+func read_int(): int = "read_int"
+
+func test(a: int): int {
+  if ( a == 3 ) {
+    return 1
+  } else {
+    return 2
+  }
+}
+
+print_int(test(read_int()))
