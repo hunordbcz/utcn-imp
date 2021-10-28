@@ -17,5 +17,9 @@ std::ostream &operator<<(std::ostream &os, Opcode kind) {
     case Opcode::JUMP_FALSE: return os << "JUMP_FALSE";
     case Opcode::JUMP: return os << "JUMP";
     case Opcode::STOP: return os << "STOP";
+    case Opcode::MUL: return os << "MUL";
+    case Opcode::DIV: return os << "DIV";
+    default:
+      break;
   }
 }

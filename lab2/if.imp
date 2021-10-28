@@ -3,7 +3,11 @@ func print_int(a: int): int = "print_int"
 func read_int(): int = "read_int"
 
 func test(a: int): int {
-  return a / 2
+  if ( a == 2 ) {
+    return 2
+  };
+
+  return 0
 }
 
 print_int(test(read_int()))
