@@ -204,4 +204,8 @@ private:
   std::map<std::string, Label> funcs_;
 
   void EmitEqual();
+
+  void EmitMul();
+
+  void EmitDiv();
 };

@@ -52,6 +52,8 @@ private:
   std::shared_ptr<Expr> ParseAddSubExpr();
   /// Parse a comparative expression.
   std::shared_ptr<Expr> ParseCmpExpr();
+  /// Parse a mul/div expression;
+  std::shared_ptr<Expr> ParseMulDivExpr();
 
   /// Helper to get the current token.
   inline const Token &Current() { return lexer_.GetToken(); }

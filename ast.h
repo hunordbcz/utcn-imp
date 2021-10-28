@@ -86,6 +86,8 @@ public:
   enum class Kind {
     ADD,
     SUB,
+    MUL,
+    DIV,
     EQUAL,
   };
 
@@ -254,8 +256,7 @@ public:
 
     const Expr &GetCond() const { return *cond_; }
     const Stmt &GetIfStmt() const { return *ifStmt_; }
-    const Stmt &GetElseStmt() const { return *elseStmt_; }
-    const bool &hasElse() const { return hasElse_; }
+    const std::shared_ptr<Stmt> GetElseStmt() const { return elseStmt_; }
 
 private:
     /// Condition for the loop.

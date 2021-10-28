@@ -199,17 +199,36 @@ std::shared_ptr<Expr> Parser::ParseCallExpr() {
 
 // -----------------------------------------------------------------------------
 std::shared_ptr<Expr> Parser::ParseAddSubExpr() {
-  std::shared_ptr<Expr> term = ParseCallExpr();
+  std::shared_ptr<Expr> term = ParseMulDivExpr();
   while (Current().Is(Token::Kind::PLUS) || Current().Is(Token::Kind::MINUS)) {
     const bool isPlus = Current().Is(Token::Kind::PLUS);
     const bool isMinus = Current().Is(Token::Kind::MINUS);
 
     lexer_.Next();
-    auto rhs = ParseCallExpr();
+    auto rhs = ParseMulDivExpr();
     if (isPlus) {
       term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::ADD, term, rhs);
     } else if (isMinus) {
       term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::SUB, term, rhs);
+    } else {
+      assert("Invalid token type");
+    }
+  }
+  return term;
+}
+
+std::shared_ptr<Expr> Parser::ParseMulDivExpr(){
+  std::shared_ptr<Expr> term = ParseCallExpr();
+  while (Current().Is(Token::Kind::STAR) || Current().Is(Token::Kind::FORW_SLASH)) {
+    const bool isMul = Current().Is(Token::Kind::STAR);
+    const bool isDiv = Current().Is(Token::Kind::FORW_SLASH);
+
+    lexer_.Next();
+    auto rhs = ParseCallExpr();
+    if (isMul) {
+      term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::MUL, term, rhs);
+    } else if (isDiv) {
+      term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::DIV, term, rhs);
     } else {
       assert("Invalid token type");
     }
