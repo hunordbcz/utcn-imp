@@ -202,4 +202,6 @@ private:
   std::unordered_map<Label, unsigned, LabelHash> labelToAddress_;
   /// Mapping from functions to their entry labels.
   std::map<std::string, Label> funcs_;
+
+  void EmitEqual();
 };

@@ -232,9 +232,13 @@ void Codegen::LowerBinaryExpr(const Scope &scope, const BinaryExpr &binary) {
     case BinaryExpr::Kind::SUB: {
       return EmitSubtract();
     }
-    
+
     case BinaryExpr::Kind::ADD: {
       return EmitAdd();
+    }
+
+    case BinaryExpr::Kind::EQUAL: {
+      return EmitEqual();
     }
   }
 }
@@ -394,4 +398,10 @@ void Codegen::EmitJump(Label label)
 {
   Emit<Opcode>(Opcode::JUMP);
   EmitFixup(label);
+}
+
+void Codegen::EmitEqual() {
+  assert(depth_ > 0 && "no elements on stack");
+  depth_ -= 1;
+  Emit<Opcode>(Opcode::EQUALITY);
 }

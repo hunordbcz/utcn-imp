@@ -85,7 +85,8 @@ public:
   /// Enumeration of binary operators.
   enum class Kind {
     ADD,
-    SUB
+    SUB,
+    EQUAL,
   };
 
 public:

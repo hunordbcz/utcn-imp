@@ -3,10 +3,12 @@ func print_int(a: int): int = "print_int"
 func read_int(): int = "read_int"
 
 func test(a: int): int {
-  if ( a == 3 ) {
-    return 1
+  if ( a == 1 ) {
+   return 1
+  } else if ( a == 2 ) {
+   return 2
   } else {
-    return 2
+   return 3
   }
 }
 

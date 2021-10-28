@@ -150,15 +150,7 @@ std::shared_ptr<IfStmt> Parser::ParseIfStmt() {
 }
 
 std::shared_ptr<Expr> Parser::ParseExpr() {
-  auto tk = Current();
-  switch (tk.GetKind()) {
-    case Token::Kind::EQUALITY:
-      assert("HAHAHAHAHA");
-    default:
-      break;
-  }
-
-  return ParseAddSubExpr();
+  return ParseCmpExpr();
 }
 
 // -----------------------------------------------------------------------------
@@ -224,6 +216,20 @@ std::shared_ptr<Expr> Parser::ParseAddSubExpr() {
   }
   return term;
 }
+
+// -----------------------------------------------------------------------------
+std::shared_ptr<Expr> Parser::ParseCmpExpr() {
+  std::shared_ptr<Expr> term = ParseAddSubExpr();
+  while (Current().Is(Token::Kind::EQUALITY)) {
+    lexer_.Next();
+    auto rhs = ParseAddSubExpr();
+
+    term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::EQUAL, term, rhs);
+  }
+
+  return term;
+}
+
 
 // -----------------------------------------------------------------------------
 const Token &Parser::Expect(Token::Kind kind) {

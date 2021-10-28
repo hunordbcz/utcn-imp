@@ -6,12 +6,11 @@
 #include <iostream>
 
 
-
 // -----------------------------------------------------------------------------
-void Interp::Run()
-{
+void Interp::Run() {
   for (;;) {
     auto op = prog_.Read<Opcode>(pc_);
+//    std::cout << op << "\n";
     switch (op) {
       case Opcode::PUSH_FUNC: {
         Push(prog_.Read<size_t>(pc_));
@@ -39,7 +38,7 @@ void Interp::Run()
         auto callee = Pop();
         switch (callee.Kind) {
           case Value::Kind::PROTO: {
-            (*callee.Val.Proto) (*this);
+            (*callee.Val.Proto)(*this);
             continue;
           }
           case Value::Kind::ADDR: {
@@ -89,6 +88,13 @@ void Interp::Run()
       }
       case Opcode::STOP: {
         return;
+      }
+      case Opcode::EQUALITY: {
+        auto rhs = PopInt();
+        auto lhs = PopInt();
+        int64_t val = lhs == rhs ? 1 : 0;
+        Push(val);
+        continue;
       }
     }
   }

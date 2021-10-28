@@ -203,6 +203,7 @@ const Token &Lexer::Next()
     case '=': {
       NextChar();
       if (chr_ == '=') {
+        NextChar();
         return tk_ = Token::Equality(loc);
       }
       return tk_ = Token::Equal(loc);
