@@ -53,7 +53,9 @@ Codegen::Binding Codegen::FuncScope::Lookup(const std::string &name) const
 // -----------------------------------------------------------------------------
 Codegen::Binding Codegen::BlockScope::Lookup(const std::string &name) const
 {
-  // TODO: nothing defined here yet.
+
+
+
   return parent_->Lookup(name);
 }
 
@@ -123,6 +125,9 @@ void Codegen::LowerStmt(const Scope &scope, const Stmt &stmt)
     case Stmt::Kind::RETURN: {
       return LowerReturnStmt(scope, static_cast<const ReturnStmt &>(stmt));
     }
+    case Stmt::Kind::LET: {
+      return LowerLetStmt(scope, static_cast<const LetStmt &>(stmt));
+    }
   }
 }
 
@@ -135,6 +140,16 @@ void Codegen::LowerBlockStmt(const Scope &scope, const BlockStmt &blockStmt)
   for (auto &stmt : blockStmt) {
     LowerStmt(blockScope, *stmt);
   }
+
+  assert(depth_ == depthIn && "mismatched block depth on exit");
+}
+
+// -----------------------------------------------------------------------------
+void Codegen::LowerLetStmt(const Scope &scope, const LetStmt &letStmt)
+{
+  unsigned depthIn = depth_;
+
+  LowerExpr(scope, letStmt.GetExpr());
 
   assert(depth_ == depthIn && "mismatched block depth on exit");
 }
@@ -247,6 +262,10 @@ void Codegen::LowerBinaryExpr(const Scope &scope, const BinaryExpr &binary) {
 
     case BinaryExpr::Kind::DIV: {
       return EmitDiv();
+    }
+
+    case BinaryExpr::Kind::MOD: {
+      return EmitMod();
     }
 
     case BinaryExpr::Kind::EQUAL: {
@@ -428,4 +447,10 @@ void Codegen::EmitDiv() {
   assert(depth_ > 0 && "no elements on stack");
   depth_ -= 1;
   Emit<Opcode>(Opcode::DIV);
+}
+
+void Codegen::EmitMod() {
+  assert(depth_ > 0 && "no elements on stack");
+  depth_ -= 1;
+  Emit<Opcode>(Opcode::MOD);
 }

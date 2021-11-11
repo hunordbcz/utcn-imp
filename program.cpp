@@ -19,7 +19,9 @@ std::ostream &operator<<(std::ostream &os, Opcode kind) {
     case Opcode::STOP: return os << "STOP";
     case Opcode::MUL: return os << "MUL";
     case Opcode::DIV: return os << "DIV";
+    case Opcode::MOD: return os << "MOD";
     default:
       break;
   }
+  return os << "unknown";
 }

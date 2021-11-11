@@ -22,6 +22,7 @@ public:
     BLOCK,
     WHILE,
     IF,
+    LET,
     EXPR,
     RETURN
   };
@@ -47,6 +48,7 @@ public:
       BINARY,
       CALL,
       INT,
+      LET,
   };
 
 public:
@@ -89,6 +91,7 @@ public:
     MUL,
     DIV,
     EQUAL,
+    MOD,
   };
 
 public:
@@ -245,28 +248,51 @@ private:
  */
 class IfStmt final : public Stmt {
 public:
-    IfStmt(std::shared_ptr<Expr> cond, std::shared_ptr<Stmt> ifStmt, std::shared_ptr<Stmt> elseStmt)
-            : Stmt(Kind::IF)
-            , cond_(cond)
-            , ifStmt_(ifStmt)
-            , elseStmt_(elseStmt)
-            , hasElse_(elseStmt != nullptr)
-    {
-    }
+  IfStmt(std::shared_ptr<Expr> cond, std::shared_ptr<Stmt> ifStmt, std::shared_ptr<Stmt> elseStmt)
+      : Stmt(Kind::IF)
+      , cond_(cond)
+      , ifStmt_(ifStmt)
+      , elseStmt_(elseStmt)
+      , hasElse_(elseStmt != nullptr)
+  {
+  }
 
-    const Expr &GetCond() const { return *cond_; }
-    const Stmt &GetIfStmt() const { return *ifStmt_; }
-    const std::shared_ptr<Stmt> GetElseStmt() const { return elseStmt_; }
+  const Expr &GetCond() const { return *cond_; }
+  const Stmt &GetIfStmt() const { return *ifStmt_; }
+  const std::shared_ptr<Stmt> GetElseStmt() const { return elseStmt_; }
 
 private:
-    /// Condition for the loop.
-    std::shared_ptr<Expr> cond_;
-    /// Expression to be executed in the loop body.
-    std::shared_ptr<Stmt> ifStmt_;
-    /// Expression to be executed in the loop body.
-    std::shared_ptr<Stmt> elseStmt_;
-    /// Boolean that says if else stmt is present
-    bool hasElse_;
+  /// Condition for the loop.
+  std::shared_ptr<Expr> cond_;
+  /// Expression to be executed in the loop body.
+  std::shared_ptr<Stmt> ifStmt_;
+  /// Expression to be executed in the loop body.
+  std::shared_ptr<Stmt> elseStmt_;
+  /// Boolean that says if else stmt is present
+  bool hasElse_;
+};
+
+/**
+ * If statement
+ *
+ * if (<cond>) stmt else stmt
+ */
+class LetStmt final : public Stmt {
+public:
+  LetStmt(std::shared_ptr<Expr> expr, const std::string_view &name)
+      : Stmt(Kind::LET)
+      , expr_(expr)
+      , name_(name)
+  {
+  }
+
+  const Expr &GetExpr() const { return *expr_; }
+
+private:
+  /// Expression to be executed in the loop body.
+  std::shared_ptr<Expr> expr_;
+  /// Name of the identifier.
+  std::string_view name_;
 };
 
 /**

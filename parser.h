@@ -41,6 +41,8 @@ private:
   std::shared_ptr<WhileStmt> ParseWhileStmt();
   /// Parse an if statement.
   std::shared_ptr<IfStmt> ParseIfStmt();
+  /// Parse a let statement.
+  std::shared_ptr<LetStmt> ParseLetStmt();
 
   /// Parse a single expression.
   std::shared_ptr<Expr> ParseExpr();
@@ -53,7 +55,7 @@ private:
   /// Parse a comparative expression.
   std::shared_ptr<Expr> ParseCmpExpr();
   /// Parse a mul/div expression;
-  std::shared_ptr<Expr> ParseMulDivExpr();
+  std::shared_ptr<Expr> ParseModMulDivExpr();
 
   /// Helper to get the current token.
   inline const Token &Current() { return lexer_.GetToken(); }

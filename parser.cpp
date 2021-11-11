@@ -86,6 +86,8 @@ std::shared_ptr<Stmt> Parser::ParseStmt() {
       return ParseWhileStmt();
     case Token::Kind::IF:
       return ParseIfStmt();
+    case Token::Kind::LET:
+      return ParseLetStmt();
     case Token::Kind::LBRACE:
       return ParseBlockStmt();
     default:
@@ -149,6 +151,21 @@ std::shared_ptr<IfStmt> Parser::ParseIfStmt() {
   return std::make_shared<IfStmt>(std::move(cond), std::move(mainStmt), std::move(elseStmt));
 }
 
+std::shared_ptr<LetStmt> Parser::ParseLetStmt() {
+  Check(Token::Kind::LET);
+  lexer_.Next();
+
+  const std::string_view identifier = Current().GetIdent();
+  lexer_.Next();
+
+  lexer_.Next(); //skip :
+  lexer_.Next(); //skip type (int)
+  lexer_.Next(); //skip =
+
+  auto expr = ParseExpr();
+  return std::make_shared<LetStmt>(std::move(expr), identifier);
+}
+
 std::shared_ptr<Expr> Parser::ParseExpr() {
   return ParseCmpExpr();
 }
@@ -199,13 +216,13 @@ std::shared_ptr<Expr> Parser::ParseCallExpr() {
 
 // -----------------------------------------------------------------------------
 std::shared_ptr<Expr> Parser::ParseAddSubExpr() {
-  std::shared_ptr<Expr> term = ParseMulDivExpr();
+  std::shared_ptr<Expr> term = ParseModMulDivExpr();
   while (Current().Is(Token::Kind::PLUS) || Current().Is(Token::Kind::MINUS)) {
     const bool isPlus = Current().Is(Token::Kind::PLUS);
     const bool isMinus = Current().Is(Token::Kind::MINUS);
 
     lexer_.Next();
-    auto rhs = ParseMulDivExpr();
+    auto rhs = ParseModMulDivExpr();
     if (isPlus) {
       term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::ADD, term, rhs);
     } else if (isMinus) {
@@ -217,11 +234,15 @@ std::shared_ptr<Expr> Parser::ParseAddSubExpr() {
   return term;
 }
 
-std::shared_ptr<Expr> Parser::ParseMulDivExpr(){
+std::shared_ptr<Expr> Parser::ParseModMulDivExpr(){
   std::shared_ptr<Expr> term = ParseCallExpr();
-  while (Current().Is(Token::Kind::STAR) || Current().Is(Token::Kind::FORW_SLASH)) {
+  while (
+      Current().Is(Token::Kind::STAR) ||
+      Current().Is(Token::Kind::FORW_SLASH) ||
+      Current().Is(Token::Kind::PERCENT)) {
     const bool isMul = Current().Is(Token::Kind::STAR);
     const bool isDiv = Current().Is(Token::Kind::FORW_SLASH);
+    const bool isMod = Current().Is(Token::Kind::PERCENT);
 
     lexer_.Next();
     auto rhs = ParseCallExpr();
@@ -229,6 +250,8 @@ std::shared_ptr<Expr> Parser::ParseMulDivExpr(){
       term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::MUL, term, rhs);
     } else if (isDiv) {
       term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::DIV, term, rhs);
+    } else if (isMod) {
+      term = std::make_shared<BinaryExpr>(BinaryExpr::Kind::MOD, term, rhs);
     } else {
       assert("Invalid token type");
     }

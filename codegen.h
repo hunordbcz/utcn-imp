@@ -39,6 +39,7 @@ private:
       FUNC,
       PROTO,
       ARG,
+
     } Kind;
 
     union {
@@ -112,6 +113,8 @@ private:
   void LowerStmt(const Scope &scope, const Stmt &stmt);
   /// Lowers a block statement.
   void LowerBlockStmt(const Scope &scope, const BlockStmt &blockStmt);
+  /// Lowers a let statement.
+  void LowerLetStmt(const Scope &scope, const LetStmt &letStmt);
   /// Lowers a while statement.
   void LowerWhileStmt(const Scope &scope, const WhileStmt &whileStmt);
   /// Lowers an if statement.
@@ -208,4 +211,6 @@ private:
   void EmitMul();
 
   void EmitDiv();
+
+  void EmitMod();
 };

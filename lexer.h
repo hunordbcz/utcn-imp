@@ -39,6 +39,7 @@ public:
     WHILE,
     IF,
     ELSE,
+    LET,
     // Symbols.
     LPAREN,
     RPAREN,
@@ -53,6 +54,7 @@ public:
     MINUS,
     STAR,
     FORW_SLASH,
+    PERCENT,
     // Complex tokens.
     INT,
     STRING,
@@ -118,12 +120,14 @@ public:
   static Token Minus(const Location &l) { return Token(l, Kind::MINUS); }
   static Token Star(const Location &l) { return Token(l, Kind::STAR); }
   static Token ForwSlash(const Location &l) { return Token(l, Kind::FORW_SLASH); }
+  static Token Percent(const Location &l) { return Token(l, Kind::PERCENT); }
   static Token Comma(const Location &l) { return Token(l, Kind::COMMA); }
   static Token Func(const Location &l) { return Token(l, Kind::FUNC); }
   static Token Return(const Location &l) { return Token(l, Kind::RETURN); }
   static Token While(const Location &l) { return Token(l, Kind::WHILE); }
   static Token If(const Location &l) { return Token(l, Kind::IF); }
   static Token Else(const Location &l) { return Token(l, Kind::ELSE); }
+  static Token Let(const Location &l) { return Token(l, Kind::LET); }
   static Token Ident(const Location &l, const std::string &str);
 
     static Token String(const Location &l, const std::string &str);

@@ -4,12 +4,15 @@ func read_int(): int = "read_int"
 
 func exp(a: int, n: int): int {
   if (n == 0) {
-    return 1;
-  } else if (a == 0) {
-    return 0;
+    return 1
+  } else {
+    let b : int = exp(a, n / 2);
+    if (n % 2 == 0) {
+      return b * b
+    } else {
+      return b * b * a
+    }
   }
-
-  return a * exp(a, n - 1);
 }
 
-print_int(exp(read_int(), read_int()));
+print_int(exp(read_int(), read_int()))
