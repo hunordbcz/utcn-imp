@@ -48,7 +48,6 @@ public:
       BINARY,
       CALL,
       INT,
-      LET,
   };
 
 public:
@@ -279,7 +278,7 @@ private:
  */
 class LetStmt final : public Stmt {
 public:
-  LetStmt(std::shared_ptr<Expr> expr, const std::string_view &name)
+  LetStmt(std::shared_ptr<Expr> expr, const std::string &name)
       : Stmt(Kind::LET)
       , expr_(expr)
       , name_(name)
@@ -288,11 +287,15 @@ public:
 
   const Expr &GetExpr() const { return *expr_; }
 
+  const std::string &getName() const {
+    return name_;
+  }
+
 private:
   /// Expression to be executed in the loop body.
   std::shared_ptr<Expr> expr_;
   /// Name of the identifier.
-  std::string_view name_;
+  std::string name_;
 };
 
 /**

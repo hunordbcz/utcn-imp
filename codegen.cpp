@@ -53,7 +53,13 @@ Codegen::Binding Codegen::FuncScope::Lookup(const std::string &name) const
 // -----------------------------------------------------------------------------
 Codegen::Binding Codegen::BlockScope::Lookup(const std::string &name) const
 {
-
+  if (auto it = vars_.find(name); it != vars_.end()) {
+    Binding b;
+    b.Kind = Binding::Kind::VAR;
+    b.Index = it->second;
+    return b;
+  }
+  return parent_->Lookup(name);
 
 
   return parent_->Lookup(name);
@@ -147,11 +153,8 @@ void Codegen::LowerBlockStmt(const Scope &scope, const BlockStmt &blockStmt)
 // -----------------------------------------------------------------------------
 void Codegen::LowerLetStmt(const Scope &scope, const LetStmt &letStmt)
 {
-  unsigned depthIn = depth_;
-
   LowerExpr(scope, letStmt.GetExpr());
-
-  assert(depth_ == depthIn && "mismatched block depth on exit");
+  scope.addVar(letStmt.getName(), depth_); //TODO remove const from every scope:(
 }
 
 // -----------------------------------------------------------------------------
@@ -233,6 +236,10 @@ void Codegen::LowerRefExpr(const Scope &scope, const RefExpr &expr)
     }
     case Binding::Kind::ARG: {
       EmitPeek(depth_ + binding.Index + 1);
+      return;
+    }
+    case Binding::Kind::VAR: {
+      EmitPeek(binding.Index);
       return;
     }
   }

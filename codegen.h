@@ -39,6 +39,7 @@ private:
       FUNC,
       PROTO,
       ARG,
+      VAR,
 
     } Kind;
 
@@ -59,6 +60,8 @@ private:
     virtual ~Scope();
 
     virtual Binding Lookup(const std::string &name) const = 0;
+
+    virtual void addVar(const std::string &name, const uint32_t &depth) = 0;
 
   protected:
     const Scope *parent_;
@@ -106,6 +109,13 @@ private:
     BlockScope(const Scope *parent) : Scope(parent) {}
 
     Binding Lookup(const std::string &name) const override;
+
+    void addVar(const std::string &name, const uint32_t &depth) const override {
+      vars_.emplace(name, depth);
+    }
+
+  private:
+    std::map<const std::string , const uint32_t> vars_;
   };
 
 private:
